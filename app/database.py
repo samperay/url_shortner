@@ -1,9 +1,11 @@
 """This file manages the SQLite database connection."""
 
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = "sqlite:///./url_shortener.db"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./url_shortener.db")
 
 engine = create_engine(
     DATABASE_URL,
