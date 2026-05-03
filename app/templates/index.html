@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FastAPI URL Shortener</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f4f4f4;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            max-width: 600px;
+            margin: auto;
+            border-radius: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e0f2fe;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>URL Shortener</h2>
+
+        <form method="post" action="/shorten">
+            <label>Enter Long URL:</label>
+            <input 
+                type="url" 
+                name="original_url" 
+                placeholder="https://example.com/some/long/url"
+                required
+            >
+
+            <button type="submit">Shorten URL</button>
+        </form>
+
+        {% if short_url %}
+        <div class="result">
+            <p><strong>Original URL:</strong></p>
+            <p>{{ original_url }}</p>
+
+            <p><strong>Short URL:</strong></p>
+            <a href="{{ short_url }}" target="_blank">
+                {{ short_url }}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
