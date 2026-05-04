@@ -54,6 +54,18 @@ url_shortener/
 │   │   └── url_router.py
 │   └── templates/
 │       └── index.html
+├── docs/
+│   ├── context/
+│   │   └── repository-context.md
+│   ├── deployment/
+│   │   └── docker-desktop-kubernetes.md
+│   └── learning/
+│       └── kubernetes-break-fix.md
+├── k8s/
+│   ├── namespace.yaml
+│   ├── deployment.yaml
+│   └── service.yaml
+├── tests/
 ├── requirements.txt
 └── README.md
 ```
@@ -227,6 +239,16 @@ Clicking the short URL redirects to the original URL.
 * Test invalid URL input
 * Test redirect functionality
 * Load test short URL generation
+
+---
+
+## 📚 Documentation
+
+Additional project notes are organized under `docs/`:
+
+* [Repository context](docs/context/repository-context.md)
+* [Docker Desktop Kubernetes deployment](docs/deployment/docker-desktop-kubernetes.md)
+* [Kubernetes break/fix learning path](docs/learning/kubernetes-break-fix.md)
 
 ---
 
