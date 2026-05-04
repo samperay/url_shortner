@@ -18,9 +18,9 @@ url_service = URLShortenerService()
 @router.get("/")
 def home(request: Request):
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "short_url": None
         }
     )
@@ -41,9 +41,9 @@ def shorten_url(
     short_url = f"{base_url}{url_mapping.short_code}"
 
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "short_url": short_url,
             "original_url": original_url
         }
