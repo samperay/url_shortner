@@ -176,6 +176,21 @@ Use lowercase words separated by hyphens.
 
 ---
 
+## Git Push Approval Rules
+
+Never run `git push` without explicit user approval.
+
+Before pushing, summarize:
+
+- Branch name
+- Commits to be pushed
+- Target remote
+- Related PR or issue
+
+Wait for the user to approve before running `git push`.
+
+---
+
 ## Pull Request Rules
 
 After implementing the fix, create a pull request.
