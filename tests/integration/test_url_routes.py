@@ -52,7 +52,9 @@ def test_redirect_to_original_url_returns_redirect_response(client):
     redirect_response = client.get(f"/{short_code}", follow_redirects=False)
 
     assert redirect_response.status_code == 307
-    assert redirect_response.headers["location"] == "https://example.com/redirect-target"
+    assert (
+        redirect_response.headers["location"] == "https://example.com/redirect-target"
+    )
 
 
 def test_redirect_to_missing_short_code_returns_404(client):
