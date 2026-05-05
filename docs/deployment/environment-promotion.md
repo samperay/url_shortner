@@ -117,7 +117,7 @@ overlay.
 
 Keep the `kubectl port-forward` command running while you test the app.
 
-## Automatic Dev Image Publishing
+## Automatic Dev And Stage Image Publishing
 
 The workflow `.github/workflows/publish-dev-image.yml` builds and pushes a Docker
 Hub image when changes are pushed to `dev`.
@@ -133,7 +133,20 @@ After pushing the image, the workflow updates
 change back to `dev`. Argo CD watches the `dev` branch and deploys the updated
 image to the `url-shortener-dev` namespace.
 
-This workflow requires these GitHub repository secrets:
+The workflow `.github/workflows/publish-stage-image.yml` runs when changes are
+pushed to `stage`, including when a `dev -> stage` promotion PR is merged. It
+builds and pushes:
+
+```text
+sunlnx/url-shortener:stage_<short-commit-id>
+```
+
+After pushing the image, the workflow updates
+`k8s/environments/stage/kustomization.yaml` with the new tag and commits that
+change back to `stage`. Argo CD should watch the `stage` branch and deploy the
+updated stage overlay to the `url-shortener-stage` namespace.
+
+These workflows require these GitHub repository secrets:
 
 - `DOCKER_HUB_LOGIN`: Docker Hub username
 - `DOCKER_HUB_TOKEN`: Docker Hub access token or password

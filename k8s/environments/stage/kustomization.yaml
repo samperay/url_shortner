@@ -9,3 +9,7 @@ labels:
       environment: stage
 patches:
   - path: service-patch.yaml
+images:
+  - name: url-shortener
+    newName: sunlnx/url-shortener
+    newTag: stage_15a7c6a

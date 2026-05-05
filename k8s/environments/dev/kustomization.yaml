@@ -12,4 +12,4 @@ patches:
 images:
   - name: url-shortener
     newName: sunlnx/url-shortener
-    newTag: dev_4fcb1ec
+    newTag: dev_03e8210

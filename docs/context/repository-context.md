@@ -8,7 +8,7 @@ future contributors and agents can get oriented quickly.
 This repository contains a small FastAPI URL shortener backed by SQLite. It is
 structured as a learning-friendly service that demonstrates clean application
 layers, local Docker usage, Kubernetes deployment basics, automated tests, and
-CI quality checks, and a dev GitOps deployment flow using Docker Hub and
+CI quality checks, and dev/stage GitOps deployment flows using Docker Hub and
 Argo CD.
 
 ## Application Architecture
@@ -50,6 +50,8 @@ Key files:
   Kubernetes overlay to Docker Desktop after typed confirmation.
 - `.github/workflows/publish-dev-image.yml`: builds and pushes the dev Docker
   Hub image, then commits the new image tag back to `dev` for Argo CD.
+- `.github/workflows/publish-stage-image.yml`: builds and pushes the stage
+  Docker Hub image, then commits the new image tag back to `stage` for Argo CD.
 
 ## Runtime Behavior
 
@@ -108,6 +110,12 @@ It runs on pushes to `dev`, builds `sunlnx/url-shortener:dev_<short-sha>`,
 pushes it to Docker Hub, updates the dev Kustomize image tag, and commits that
 tag update back to `dev`.
 
+The stage image publishing workflow is
+`.github/workflows/publish-stage-image.yml`. It runs on pushes to `stage`,
+builds `sunlnx/url-shortener:stage_<short-sha>`, pushes it to Docker Hub,
+updates the stage Kustomize image tag, and commits that tag update back to
+`stage`.
+
 Required GitHub repository secrets for the Docker Hub push:
 
 - `DOCKER_HUB_LOGIN`: Docker Hub username.
@@ -115,7 +123,7 @@ Required GitHub repository secrets for the Docker Hub push:
 
 ## Deployment Notes
 
-The repository includes Docker, local Kubernetes support, and dev GitOps
+The repository includes Docker, local Kubernetes support, and dev/stage GitOps
 deployment:
 
 - `scripts/start.sh`: runs the local Uvicorn development server.
@@ -130,16 +138,18 @@ deployment:
 - `k8s/base/service.yaml`: exposes the app through a Docker Desktop NodePort.
 - `k8s/environments/dev`: targets Docker Hub image `sunlnx/url-shortener` for
   Argo CD deployment to `url-shortener-dev`.
-- `k8s/environments/stage` and
-  `k8s/environments/prod`: create environment namespaces and overlay
-  environment-specific settings.
-- Argo CD watches the `dev` branch and deploys the rendered dev overlay.
+- `k8s/environments/stage`: targets Docker Hub image `sunlnx/url-shortener` for
+  Argo CD deployment to `url-shortener-stage`.
+- `k8s/environments/prod`: creates the production namespace and overlays
+  production-specific settings.
+- Argo CD watches the `dev` branch for dev and the `stage` branch for staging.
 
 Current automation scope:
 
-- `dev` is automated through GitHub Actions, Docker Hub, and Argo CD.
-- `stage` and `prod` do not currently have image publishing workflows or Argo CD
-  applications documented in this repository.
+- `dev` and `stage` are automated through GitHub Actions, Docker Hub, and
+  Argo CD.
+- `prod` does not currently have an image publishing workflow or Argo CD
+  application documented in this repository.
 - The local deployment scripts are still useful for manual Docker Desktop
   testing because they build `url-shortener:dev` locally and override the
   Deployment image after applying the overlay.
@@ -174,6 +184,10 @@ Dev deployment expectations:
 - Let GitHub Actions publish `sunlnx/url-shortener:dev_<short-sha>`.
 - Let the workflow commit the updated dev image tag.
 - Let Argo CD sync the `dev` overlay into `url-shortener-dev`.
+- Promote `dev` into `stage`.
+- Let GitHub Actions publish `sunlnx/url-shortener:stage_<short-sha>`.
+- Let the workflow commit the updated stage image tag.
+- Let Argo CD sync the `stage` overlay into `url-shortener-stage`.
 - Use `scripts/deploy-*.sh` only for manual Docker Desktop local testing.
 
 ## Current Documentation Layout
