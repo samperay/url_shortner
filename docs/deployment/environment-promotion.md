@@ -63,6 +63,12 @@ Build the local image before deploying any environment:
 docker build -t url-shortener:dev .
 ```
 
+For non-Kubernetes local development, start the app with:
+
+```bash
+./scripts/start.sh
+```
+
 Deploy development:
 
 ```bash

@@ -39,6 +39,8 @@ Key files:
 - `app/models.py`: defines the `url_mappings` SQLAlchemy model.
 - `app/schemas.py`: defines Pydantic request/response models.
 - `app/templates/index.html`: provides the simple HTML form UI.
+- `scripts/start.sh`: starts the local FastAPI development server with reload
+  enabled.
 
 ## Runtime Behavior
 
@@ -96,6 +98,7 @@ Ruff, pytest, and coverage options are configured in `pyproject.toml`.
 
 The repository includes Docker and local Kubernetes support:
 
+- `scripts/start.sh`: runs the local Uvicorn development server.
 - `Dockerfile`: builds the FastAPI app image.
 - `k8s/base/deployment.yaml`: runs the app with readiness/liveness probes and a
   learning-friendly `emptyDir` SQLite volume.
@@ -132,4 +135,11 @@ docs/
 │   └── environment-promotion.md
 └── learning/
     └── kubernetes-break-fix.md
+```
+
+Local scripts live under:
+
+```text
+scripts/
+└── start.sh
 ```

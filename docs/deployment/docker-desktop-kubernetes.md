@@ -58,6 +58,12 @@ http://localhost:8000
 
 Stop the container with `Ctrl+C`.
 
+For normal non-container local development, use:
+
+```bash
+./scripts/start.sh
+```
+
 ## 2. Deploy to Kubernetes
 
 Apply one environment overlay. For day-to-day development, start with `dev`:
