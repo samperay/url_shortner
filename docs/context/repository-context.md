@@ -97,12 +97,16 @@ Ruff, pytest, and coverage options are configured in `pyproject.toml`.
 The repository includes Docker and local Kubernetes support:
 
 - `Dockerfile`: builds the FastAPI app image.
-- `k8s/namespace.yaml`: creates the `url-shortener` namespace.
-- `k8s/deployment.yaml`: runs the app with readiness/liveness probes and a
+- `k8s/base/deployment.yaml`: runs the app with readiness/liveness probes and a
   learning-friendly `emptyDir` SQLite volume.
-- `k8s/service.yaml`: exposes the app through a Docker Desktop NodePort.
+- `k8s/base/service.yaml`: exposes the app through a Docker Desktop NodePort.
+- `k8s/environments/dev`, `k8s/environments/stage`, and
+  `k8s/environments/prod`: create environment namespaces and overlay
+  environment-specific settings.
 
-Deployment docs are grouped under `docs/deployment/`.
+Deployment docs are grouped under `docs/deployment/`. The Kubernetes layout uses
+a reusable `k8s/base/` manifest and environment overlays under
+`k8s/environments/` for `dev`, `stage`, and `prod`.
 Kubernetes learning exercises are grouped under `docs/learning/`.
 
 ## Repository Workflow
@@ -124,7 +128,8 @@ docs/
 ├── context/
 │   └── repository-context.md
 ├── deployment/
-│   └── docker-desktop-kubernetes.md
+│   ├── docker-desktop-kubernetes.md
+│   └── environment-promotion.md
 └── learning/
     └── kubernetes-break-fix.md
 ```

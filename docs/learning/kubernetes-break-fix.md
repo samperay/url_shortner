@@ -6,10 +6,14 @@ Start from a healthy deployment:
 
 ```bash
 docker build -t url-shortener:dev .
-kubectl apply -f k8s/namespace.yaml
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-kubectl rollout status deployment/url-shortener -n url-shortener
+kubectl apply -k k8s/environments/dev
+kubectl rollout status deployment/url-shortener -n url-shortener-dev
+kubectl port-forward svc/url-shortener 30080:80 -n url-shortener-dev
+```
+
+Keep the port-forward running in that terminal. In another terminal:
+
+```bash
 curl http://localhost:30080/health
 ```
 
@@ -36,14 +40,14 @@ Goal: Learn `ImagePullBackOff`.
 Break it:
 
 ```bash
-kubectl set image deployment/url-shortener url-shortener=url-shortener:missing -n url-shortener
-kubectl get pods -n url-shortener
+kubectl set image deployment/url-shortener url-shortener=url-shortener:missing -n url-shortener-dev
+kubectl get pods -n url-shortener-dev
 ```
 
 Observe:
 
 ```bash
-kubectl describe pod <pod-name> -n url-shortener
+kubectl describe pod <pod-name> -n url-shortener-dev
 ```
 
 Expected symptom:
@@ -59,8 +63,8 @@ The Deployment uses `imagePullPolicy: Never`, so Kubernetes expects the image to
 Fix it:
 
 ```bash
-kubectl set image deployment/url-shortener url-shortener=url-shortener:dev -n url-shortener
-kubectl rollout status deployment/url-shortener -n url-shortener
+kubectl set image deployment/url-shortener url-shortener=url-shortener:dev -n url-shortener-dev
+kubectl rollout status deployment/url-shortener -n url-shortener-dev
 curl http://localhost:30080/health
 ```
 
@@ -68,7 +72,7 @@ curl http://localhost:30080/health
 
 Goal: Learn the difference between `containerPort`, `targetPort`, and app runtime port.
 
-Break it by editing `k8s/service.yaml`:
+Break it by editing `k8s/base/service.yaml`:
 
 ```yaml
 targetPort: 9999
@@ -77,7 +81,7 @@ targetPort: 9999
 Apply:
 
 ```bash
-kubectl apply -f k8s/service.yaml
+kubectl apply -k k8s/environments/dev
 curl http://localhost:30080/health
 ```
 
@@ -90,8 +94,8 @@ Connection refused
 Observe:
 
 ```bash
-kubectl get endpoints url-shortener -n url-shortener
-kubectl describe service url-shortener -n url-shortener
+kubectl get endpoints url-shortener -n url-shortener-dev
+kubectl describe service url-shortener -n url-shortener-dev
 ```
 
 Why it broke:
@@ -107,7 +111,7 @@ targetPort: 8000
 Apply and test:
 
 ```bash
-kubectl apply -f k8s/service.yaml
+kubectl apply -k k8s/environments/dev
 curl http://localhost:30080/health
 ```
 
@@ -115,7 +119,7 @@ curl http://localhost:30080/health
 
 Goal: Learn how Services find Pods.
 
-Break it by editing `k8s/service.yaml`:
+Break it by editing `k8s/base/service.yaml`:
 
 ```yaml
 selector:
@@ -125,8 +129,8 @@ selector:
 Apply:
 
 ```bash
-kubectl apply -f k8s/service.yaml
-kubectl get endpoints url-shortener -n url-shortener
+kubectl apply -k k8s/environments/dev
+kubectl get endpoints url-shortener -n url-shortener-dev
 ```
 
 Expected symptom:
@@ -149,7 +153,7 @@ selector:
 Apply and test:
 
 ```bash
-kubectl apply -f k8s/service.yaml
+kubectl apply -k k8s/environments/dev
 curl http://localhost:30080/health
 ```
 
@@ -157,7 +161,7 @@ curl http://localhost:30080/health
 
 Goal: Learn why a running Pod may still receive no traffic.
 
-Break it by editing `k8s/deployment.yaml`:
+Break it by editing `k8s/base/deployment.yaml`:
 
 ```yaml
 readinessProbe:
@@ -169,9 +173,9 @@ readinessProbe:
 Apply:
 
 ```bash
-kubectl apply -f k8s/deployment.yaml
-kubectl get pods -n url-shortener
-kubectl describe pod <pod-name> -n url-shortener
+kubectl apply -k k8s/environments/dev
+kubectl get pods -n url-shortener-dev
+kubectl describe pod <pod-name> -n url-shortener-dev
 ```
 
 Expected symptom:
@@ -197,8 +201,8 @@ readinessProbe:
 Apply and test:
 
 ```bash
-kubectl apply -f k8s/deployment.yaml
-kubectl rollout status deployment/url-shortener -n url-shortener
+kubectl apply -k k8s/environments/dev
+kubectl rollout status deployment/url-shortener -n url-shortener-dev
 curl http://localhost:30080/health
 ```
 
@@ -206,7 +210,7 @@ curl http://localhost:30080/health
 
 Goal: Learn restart behavior caused by health checks.
 
-Break it by editing `k8s/deployment.yaml`:
+Break it by editing `k8s/base/deployment.yaml`:
 
 ```yaml
 livenessProbe:
@@ -220,8 +224,8 @@ livenessProbe:
 Apply:
 
 ```bash
-kubectl apply -f k8s/deployment.yaml
-kubectl get pods -n url-shortener --watch
+kubectl apply -k k8s/environments/dev
+kubectl get pods -n url-shortener-dev --watch
 ```
 
 Expected symptom:
@@ -231,8 +235,8 @@ The Pod repeatedly restarts.
 Observe:
 
 ```bash
-kubectl describe pod <pod-name> -n url-shortener
-kubectl logs <pod-name> -n url-shortener --previous
+kubectl describe pod <pod-name> -n url-shortener-dev
+kubectl logs <pod-name> -n url-shortener-dev --previous
 ```
 
 Why it broke:
@@ -253,15 +257,15 @@ livenessProbe:
 Apply and test:
 
 ```bash
-kubectl apply -f k8s/deployment.yaml
-kubectl rollout status deployment/url-shortener -n url-shortener
+kubectl apply -k k8s/environments/dev
+kubectl rollout status deployment/url-shortener -n url-shortener-dev
 ```
 
 ## Exercise 6: Bad Database Path
 
 Goal: Learn environment variables, volume mounts, and app startup failures.
 
-Break it by editing `k8s/deployment.yaml`:
+Break it by editing `k8s/base/deployment.yaml`:
 
 ```yaml
 env:
@@ -272,9 +276,9 @@ env:
 Apply:
 
 ```bash
-kubectl apply -f k8s/deployment.yaml
-kubectl get pods -n url-shortener
-kubectl logs deployment/url-shortener -n url-shortener
+kubectl apply -k k8s/environments/dev
+kubectl get pods -n url-shortener-dev
+kubectl logs deployment/url-shortener -n url-shortener-dev
 ```
 
 Expected symptom:
@@ -299,7 +303,7 @@ volumeMounts:
 Apply and test:
 
 ```bash
-kubectl apply -f k8s/deployment.yaml
+kubectl apply -k k8s/environments/dev
 curl http://localhost:30080/health
 ```
 
@@ -310,8 +314,8 @@ Goal: Learn how Deployments self-heal.
 Break it:
 
 ```bash
-kubectl delete pod <pod-name> -n url-shortener
-kubectl get pods -n url-shortener --watch
+kubectl delete pod <pod-name> -n url-shortener-dev
+kubectl get pods -n url-shortener-dev --watch
 ```
 
 Expected symptom:
@@ -339,8 +343,8 @@ Goal: Learn replicas and the SQLite limitation.
 Scale:
 
 ```bash
-kubectl scale deployment/url-shortener --replicas=3 -n url-shortener
-kubectl get pods -n url-shortener
+kubectl scale deployment/url-shortener --replicas=3 -n url-shortener-dev
+kubectl get pods -n url-shortener-dev
 ```
 
 Expected result:
@@ -359,14 +363,14 @@ Fix options:
 Scale back:
 
 ```bash
-kubectl scale deployment/url-shortener --replicas=1 -n url-shortener
+kubectl scale deployment/url-shortener --replicas=1 -n url-shortener-dev
 ```
 
 ## Exercise 9: Resource Pressure
 
 Goal: Learn requests, limits, and scheduling.
 
-Break it by adding unrealistic resource requests to the container in `k8s/deployment.yaml`:
+Break it by adding unrealistic resource requests to the container in `k8s/base/deployment.yaml`:
 
 ```yaml
 resources:
@@ -378,9 +382,9 @@ resources:
 Apply:
 
 ```bash
-kubectl apply -f k8s/deployment.yaml
-kubectl get pods -n url-shortener
-kubectl describe pod <pod-name> -n url-shortener
+kubectl apply -k k8s/environments/dev
+kubectl get pods -n url-shortener-dev
+kubectl describe pod <pod-name> -n url-shortener-dev
 ```
 
 Expected symptom:
@@ -406,8 +410,8 @@ resources:
 Apply:
 
 ```bash
-kubectl apply -f k8s/deployment.yaml
-kubectl rollout status deployment/url-shortener -n url-shortener
+kubectl apply -k k8s/environments/dev
+kubectl rollout status deployment/url-shortener -n url-shortener-dev
 ```
 
 ## Exercise 10: Roll Back a Bad Release
@@ -417,22 +421,22 @@ Goal: Learn rollout history and undo.
 Create a bad release:
 
 ```bash
-kubectl set image deployment/url-shortener url-shortener=url-shortener:bad -n url-shortener
-kubectl rollout status deployment/url-shortener -n url-shortener
+kubectl set image deployment/url-shortener url-shortener=url-shortener:bad -n url-shortener-dev
+kubectl rollout status deployment/url-shortener -n url-shortener-dev
 ```
 
 Observe:
 
 ```bash
-kubectl rollout history deployment/url-shortener -n url-shortener
-kubectl get pods -n url-shortener
+kubectl rollout history deployment/url-shortener -n url-shortener-dev
+kubectl get pods -n url-shortener-dev
 ```
 
 Fix by rollback:
 
 ```bash
-kubectl rollout undo deployment/url-shortener -n url-shortener
-kubectl rollout status deployment/url-shortener -n url-shortener
+kubectl rollout undo deployment/url-shortener -n url-shortener-dev
+kubectl rollout status deployment/url-shortener -n url-shortener-dev
 curl http://localhost:30080/health
 ```
 
@@ -441,11 +445,11 @@ curl http://localhost:30080/health
 Use this order when the app is broken:
 
 ```bash
-kubectl get pods -n url-shortener
-kubectl describe pod <pod-name> -n url-shortener
-kubectl logs <pod-name> -n url-shortener
-kubectl get service,endpoints -n url-shortener
-kubectl describe service url-shortener -n url-shortener
+kubectl get pods -n url-shortener-dev
+kubectl describe pod <pod-name> -n url-shortener-dev
+kubectl logs <pod-name> -n url-shortener-dev
+kubectl get service,endpoints -n url-shortener-dev
+kubectl describe service url-shortener -n url-shortener-dev
 curl -v http://localhost:30080/health
 ```
 

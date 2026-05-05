@@ -6,7 +6,7 @@ This guide deploys the FastAPI URL Shortener to the single-node Kubernetes clust
 
 - FastAPI app served by Uvicorn on port `8000`
 - Docker image named `url-shortener:dev`
-- Kubernetes `Deployment` with one replica
+- Kubernetes `Deployment` with one replica per environment
 - Kubernetes `Service` exposed inside the cluster, with local access through
   `kubectl port-forward`
 - SQLite database stored in an `emptyDir` volume at `/data/url_shortener.db`
@@ -60,24 +60,22 @@ Stop the container with `Ctrl+C`.
 
 ## 2. Deploy to Kubernetes
 
-Apply the manifests:
+Apply one environment overlay. For day-to-day development, start with `dev`:
 
 ```bash
-kubectl apply -f k8s/namespace.yaml
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
+kubectl apply -k k8s/environments/dev
 ```
 
 Check the rollout:
 
 ```bash
-kubectl rollout status deployment/url-shortener -n url-shortener
+kubectl rollout status deployment/url-shortener -n url-shortener-dev
 ```
 
 Check the resources:
 
 ```bash
-kubectl get all -n url-shortener
+kubectl get all -n url-shortener-dev
 ```
 
 ## 3. Open the App
@@ -86,7 +84,7 @@ Use `kubectl port-forward` for the most reliable local access path on Docker
 Desktop Kubernetes:
 
 ```bash
-kubectl port-forward svc/url-shortener 30080:80 -n url-shortener
+kubectl port-forward svc/url-shortener 30080:80 -n url-shortener-dev
 ```
 
 Keep that terminal open. In another terminal, verify the app:
@@ -121,7 +119,7 @@ curl http://localhost:30080/health
 but the Pod is `Running` and `Ready`, test the Service from inside the cluster:
 
 ```bash
-kubectl run curl-test -n url-shortener --rm -i --restart=Never \
+kubectl run curl-test -n url-shortener-dev --rm -i --restart=Never \
   --image=curlimages/curl -- curl -sS http://url-shortener/health
 ```
 
@@ -133,31 +131,31 @@ working. Use `kubectl port-forward` for local browser access.
 List Pods:
 
 ```bash
-kubectl get pods -n url-shortener
+kubectl get pods -n url-shortener-dev
 ```
 
 Describe the Deployment:
 
 ```bash
-kubectl describe deployment url-shortener -n url-shortener
+kubectl describe deployment url-shortener -n url-shortener-dev
 ```
 
 Describe a Pod:
 
 ```bash
-kubectl describe pod <pod-name> -n url-shortener
+kubectl describe pod <pod-name> -n url-shortener-dev
 ```
 
 View logs:
 
 ```bash
-kubectl logs deployment/url-shortener -n url-shortener
+kubectl logs deployment/url-shortener -n url-shortener-dev
 ```
 
 Open a shell inside the Pod:
 
 ```bash
-kubectl exec -it deployment/url-shortener -n url-shortener -- sh
+kubectl exec -it deployment/url-shortener -n url-shortener-dev -- sh
 ```
 
 Check the health endpoint from your machine:
@@ -175,8 +173,8 @@ After changing Python or template files:
 
 ```bash
 docker build -t url-shortener:dev .
-kubectl rollout restart deployment/url-shortener -n url-shortener
-kubectl rollout status deployment/url-shortener -n url-shortener
+kubectl rollout restart deployment/url-shortener -n url-shortener-dev
+kubectl rollout status deployment/url-shortener -n url-shortener-dev
 ```
 
 If the manifest uses `imagePullPolicy: Never`, Kubernetes uses the local Docker
@@ -188,10 +186,13 @@ a registry your cluster can pull from.
 Delete the app:
 
 ```bash
-kubectl delete namespace url-shortener
+kubectl delete namespace url-shortener-dev
 ```
 
 This also deletes the `emptyDir` SQLite data.
+
+For stage and production environment commands, see
+[Environment promotion flow](environment-promotion.md).
 
 ## 7. Next Production Improvements
 

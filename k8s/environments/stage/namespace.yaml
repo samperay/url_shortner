@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: url-shortener-stage
+  labels:
+    app: url-shortener
+    environment: stage
