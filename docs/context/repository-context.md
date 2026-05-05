@@ -8,7 +8,8 @@ future contributors and agents can get oriented quickly.
 This repository contains a small FastAPI URL shortener backed by SQLite. It is
 structured as a learning-friendly service that demonstrates clean application
 layers, local Docker usage, Kubernetes deployment basics, automated tests, and
-CI quality checks.
+CI quality checks, and a dev GitOps deployment flow using Docker Hub and
+Argo CD.
 
 ## Application Architecture
 
@@ -47,6 +48,8 @@ Key files:
   stage Kubernetes overlay to Docker Desktop.
 - `scripts/deploy-prod.sh`: builds the local Docker image and deploys the prod
   Kubernetes overlay to Docker Desktop after typed confirmation.
+- `.github/workflows/publish-dev-image.yml`: builds and pushes the dev Docker
+  Hub image, then commits the new image tag back to `dev` for Argo CD.
 
 ## Runtime Behavior
 
@@ -86,7 +89,7 @@ The suite currently covers the `app` package and reports full app coverage.
 
 ## CI And Quality
 
-The GitHub Actions workflow is `.github/workflows/ci.yml`.
+The main quality workflow is `.github/workflows/ci.yml`.
 
 It runs on every push and pull request update:
 
@@ -100,9 +103,15 @@ It runs on every push and pull request update:
 
 Ruff, pytest, and coverage options are configured in `pyproject.toml`.
 
+The dev image publishing workflow is `.github/workflows/publish-dev-image.yml`.
+It runs on pushes to `dev`, builds `sunlnx/url-shortener:dev_<short-sha>`,
+pushes it to Docker Hub, updates the dev Kustomize image tag, and commits that
+tag update back to `dev`.
+
 ## Deployment Notes
 
-The repository includes Docker and local Kubernetes support:
+The repository includes Docker, local Kubernetes support, and dev GitOps
+deployment:
 
 - `scripts/start.sh`: runs the local Uvicorn development server.
 - `scripts/deploy-dev.sh`: deploys the `url-shortener-dev` namespace locally.
@@ -114,9 +123,12 @@ The repository includes Docker and local Kubernetes support:
 - `k8s/base/deployment.yaml`: runs the app with readiness/liveness probes and a
   learning-friendly `emptyDir` SQLite volume.
 - `k8s/base/service.yaml`: exposes the app through a Docker Desktop NodePort.
-- `k8s/environments/dev`, `k8s/environments/stage`, and
+- `k8s/environments/dev`: targets Docker Hub image `sunlnx/url-shortener` for
+  Argo CD deployment to `url-shortener-dev`.
+- `k8s/environments/stage` and
   `k8s/environments/prod`: create environment namespaces and overlay
   environment-specific settings.
+- Argo CD watches the `dev` branch and deploys the rendered dev overlay.
 
 Deployment docs are grouped under `docs/deployment/`. The Kubernetes layout uses
 a reusable `k8s/base/` manifest and environment overlays under
@@ -134,6 +146,14 @@ Important workflow expectations:
 - Keep PR descriptions structured with summary, testing, risk, and checklist.
 - Apply labels and assignees when possible.
 - Do not run `git push` without explicit user approval.
+
+Dev deployment expectations:
+
+- Merge feature PRs into `dev`.
+- Let GitHub Actions publish `sunlnx/url-shortener:dev_<short-sha>`.
+- Let the workflow commit the updated dev image tag.
+- Let Argo CD sync the `dev` overlay into `url-shortener-dev`.
+- Use `scripts/deploy-*.sh` only for manual Docker Desktop local testing.
 
 ## Current Documentation Layout
 
