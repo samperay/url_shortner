@@ -72,28 +72,47 @@ For non-Kubernetes local development, start the app with:
 Deploy development:
 
 ```bash
-kubectl apply -k k8s/environments/dev
-kubectl rollout status deployment/url-shortener -n url-shortener-dev
+./scripts/deploy-dev.sh
 kubectl port-forward svc/url-shortener 30080:80 -n url-shortener-dev
 ```
+
+The script builds the local Docker image, applies `k8s/environments/dev`, and
+waits for the dev rollout.
 
 Deploy stage:
 
 ```bash
-kubectl apply -k k8s/environments/stage
-kubectl rollout status deployment/url-shortener -n url-shortener-stage
+./scripts/deploy-stage.sh
 kubectl port-forward svc/url-shortener 30081:80 -n url-shortener-stage
 ```
 
 Deploy production after manual approval:
 
 ```bash
-kubectl apply -k k8s/environments/prod
-kubectl rollout status deployment/url-shortener -n url-shortener-prod
+./scripts/deploy-prod.sh
 kubectl port-forward svc/url-shortener 30082:80 -n url-shortener-prod
 ```
 
+The production script asks you to type `prod` before it applies the production
+overlay.
+
 Keep the `kubectl port-forward` command running while you test the app.
+
+## Automatic Dev Deployment
+
+The workflow `.github/workflows/deploy-dev-local.yml` deploys to the Docker
+Desktop `url-shortener-dev` namespace when changes are pushed to `dev`.
+
+This workflow requires a self-hosted GitHub Actions runner on your machine with:
+
+- Docker Desktop running
+- Kubernetes enabled in Docker Desktop
+- `kubectl` configured with the `docker-desktop` context
+- The runner labeled `docker-desktop`
+
+GitHub-hosted runners cannot deploy into your laptop's Docker Desktop cluster.
+If a self-hosted runner is not installed, run `./scripts/deploy-dev.sh`
+manually after merging into `dev`.
 
 ## Health Checks
 
@@ -127,8 +146,7 @@ Before production deployment:
 - Confirm CI passed on `prod`.
 - Confirm the exact image tag or commit being deployed.
 - Get explicit manual approval from the environment owner.
-- Run the production `kubectl apply -k k8s/environments/prod` command only
-  after that approval.
+- Run `./scripts/deploy-prod.sh` only after that approval.
 
 ## Future Cloud Migration Notes
 
