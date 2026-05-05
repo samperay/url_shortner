@@ -108,6 +108,11 @@ It runs on pushes to `dev`, builds `sunlnx/url-shortener:dev_<short-sha>`,
 pushes it to Docker Hub, updates the dev Kustomize image tag, and commits that
 tag update back to `dev`.
 
+Required GitHub repository secrets for the Docker Hub push:
+
+- `DOCKER_HUB_LOGIN`: Docker Hub username.
+- `DOCKER_HUB_TOKEN`: Docker Hub access token or password.
+
 ## Deployment Notes
 
 The repository includes Docker, local Kubernetes support, and dev GitOps
@@ -129,6 +134,22 @@ deployment:
   `k8s/environments/prod`: create environment namespaces and overlay
   environment-specific settings.
 - Argo CD watches the `dev` branch and deploys the rendered dev overlay.
+
+Current automation scope:
+
+- `dev` is automated through GitHub Actions, Docker Hub, and Argo CD.
+- `stage` and `prod` do not currently have image publishing workflows or Argo CD
+  applications documented in this repository.
+- The local deployment scripts are still useful for manual Docker Desktop
+  testing because they build `url-shortener:dev` locally and override the
+  Deployment image after applying the overlay.
+
+Local access:
+
+- The dev Service uses NodePort `30080`.
+- On Docker Desktop for macOS, direct `http://localhost:30080` access may work,
+  but `kubectl port-forward svc/url-shortener 30080:80 -n url-shortener-dev`
+  is the most reliable local access path.
 
 Deployment docs are grouped under `docs/deployment/`. The Kubernetes layout uses
 a reusable `k8s/base/` manifest and environment overlays under
