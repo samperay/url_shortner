@@ -6,7 +6,7 @@ This repository supports three Kubernetes environments:
 | --- | --- | --- | --- |
 | Development | `dev` | `url-shortener-dev` | `30080` |
 | Stage | `stage` | `url-shortener-stage` | `30081` |
-| Production | `prod` | `url-shortener-prod` | `30082` |
+| Production | `master` | `url-shortener-prod` | `30082` |
 
 For now these environments target Docker Desktop Kubernetes. Later, the same
 layout can be pointed at a cloud Kubernetes cluster by changing image publishing
@@ -14,7 +14,7 @@ and cluster credentials, while keeping the promotion model.
 
 ## One-Time Branch Setup
 
-If the `dev`, `stage`, and `prod` branches do not exist yet, create them from
+If the `dev` and `stage` branches do not exist yet, create them from
 the current stable `master` branch:
 
 ```bash
@@ -22,13 +22,12 @@ git switch master
 git pull origin master
 git branch dev
 git branch stage
-git branch prod
 ```
 
 Push the branches only after approval:
 
 ```bash
-git push origin dev stage prod
+git push origin dev stage
 ```
 
 ## Branch Promotion Rules
@@ -38,8 +37,9 @@ Use this branch flow:
 1. Create feature work from `dev`.
 2. Open feature PRs into `dev`.
 3. After `dev` testing passes, open a PR from `dev` into `stage`.
-4. After `stage` testing passes, open a PR from `stage` into `prod`.
-5. Deploy to the `prod` namespace only after manual approval.
+4. After `stage` testing passes, open a PR from `stage` into `master`.
+5. Deploy to the production namespace only after `master` is updated and manual
+   approval is given.
 
 Recommended branch names:
 
@@ -52,8 +52,27 @@ Promotion PRs should be small and explicit:
 ```text
 feature/my-change -> dev
 dev -> stage
-stage -> prod
+stage -> master
 ```
+
+## Issue Closing During Promotion
+
+GitHub auto-closes issues only when a closing keyword is merged into the
+repository default branch, currently `master`.
+
+Feature PRs into `dev` can include `Closes #<issue-number>` for traceability,
+but the final `stage -> master` promotion PR must also include every issue that
+the promotion completes:
+
+```text
+Closes #11
+Closes #13
+```
+
+Before opening the `stage -> master` PR, review the merged feature PRs included
+in the promotion and copy their related issue references into the promotion PR
+body. That ensures GitHub closes the issues automatically when the promotion PR
+is merged.
 
 ## Docker Desktop Deployment
 
@@ -151,8 +170,8 @@ production deployment job.
 
 Before production deployment:
 
-- Confirm the `stage -> prod` PR is approved and merged.
-- Confirm CI passed on `prod`.
+- Confirm the `stage -> master` PR is approved and merged.
+- Confirm CI passed on `master`.
 - Confirm the exact image tag or commit being deployed.
 - Get explicit manual approval from the environment owner.
 - Run `./scripts/deploy-prod.sh` only after that approval.
