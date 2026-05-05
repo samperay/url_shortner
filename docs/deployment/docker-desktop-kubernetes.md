@@ -186,9 +186,9 @@ kubectl rollout restart deployment/url-shortener -n url-shortener-dev
 kubectl rollout status deployment/url-shortener -n url-shortener-dev
 ```
 
-If the manifest uses `imagePullPolicy: Never`, Kubernetes uses the local Docker
-Desktop image. If you remove that setting, make sure the image is available from
-a registry your cluster can pull from.
+The local deployment scripts build `url-shortener:dev`, apply the selected
+overlay, and then override the Deployment to use that Docker Desktop image.
+Argo CD deployments use the image tag recorded in the environment overlay.
 
 ## 6. Clean Up
 

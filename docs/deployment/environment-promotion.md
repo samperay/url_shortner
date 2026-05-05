@@ -98,21 +98,30 @@ overlay.
 
 Keep the `kubectl port-forward` command running while you test the app.
 
-## Automatic Dev Deployment
+## Automatic Dev Image Publishing
 
-The workflow `.github/workflows/deploy-dev-local.yml` deploys to the Docker
-Desktop `url-shortener-dev` namespace when changes are pushed to `dev`.
+The workflow `.github/workflows/publish-dev-image.yml` builds and pushes a Docker
+Hub image when changes are pushed to `dev`.
 
-This workflow requires a self-hosted GitHub Actions runner on your machine with:
+The image tag format is:
 
-- Docker Desktop running
-- Kubernetes enabled in Docker Desktop
-- `kubectl` configured with the `docker-desktop` context
-- The runner labeled `docker-desktop`
+```text
+sunlnx/url-shortener:dev_<short-commit-id>
+```
 
-GitHub-hosted runners cannot deploy into your laptop's Docker Desktop cluster.
-If a self-hosted runner is not installed, run `./scripts/deploy-dev.sh`
-manually after merging into `dev`.
+After pushing the image, the workflow updates
+`k8s/environments/dev/kustomization.yaml` with the new tag and commits that
+change back to `dev`. Argo CD watches the `dev` branch and deploys the updated
+image to the `url-shortener-dev` namespace.
+
+This workflow requires these GitHub repository secrets:
+
+- `DOCKER_HUB_LOGIN`: Docker Hub username
+- `DOCKER_HUB_TOKEN`: Docker Hub access token or password
+
+The local deployment scripts are still for Docker Desktop-only manual testing.
+They build `url-shortener:dev`, apply the selected overlay, and override the
+Deployment to use the local Docker Desktop image.
 
 ## Health Checks
 
@@ -152,8 +161,7 @@ Before production deployment:
 
 When moving away from Docker Desktop:
 
-- Push images to a registry instead of using `imagePullPolicy: Never`.
-- Use unique image tags per commit or release.
+- Continue using unique image tags per commit or release.
 - Replace `emptyDir` with persistent storage or a managed database.
 - Store cluster credentials in GitHub Actions environments or a deployment
   platform.
