@@ -188,10 +188,17 @@ Use this promotion flow for application changes:
 
 For Docker Desktop Kubernetes:
 
-- Deploy `dev` changes to the `url-shortener-dev` namespace.
+- Merge `dev` changes and let `.github/workflows/publish-dev-image.yml`
+  publish `sunlnx/url-shortener:dev_<short-sha>`.
+- Let Argo CD deploy `dev` branch changes to the `url-shortener-dev`
+  namespace.
 - Deploy `stage` changes to the `url-shortener-stage` namespace.
 - Deploy `prod` changes to the `url-shortener-prod` namespace only after
   manual approval.
+
+Use `scripts/deploy-dev.sh`, `scripts/deploy-stage.sh`, and
+`scripts/deploy-prod.sh` only for manual local Docker Desktop testing. These
+scripts build and deploy the local `url-shortener:dev` image.
 
 Do not automatically deploy production from a branch push or merge.
 

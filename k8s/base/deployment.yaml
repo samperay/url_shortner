@@ -17,7 +17,7 @@ spec:
       containers:
         - name: url-shortener
           image: url-shortener:dev
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           env:
