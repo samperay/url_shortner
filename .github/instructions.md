@@ -161,15 +161,15 @@ If assignee assignment fails due to permission issues, continue the workflow and
 Create a branch using this format:
 
 ```text
-codex/<issue-number>-short-description
+feature/<issue-number>-short-description
 ```
 
 Examples:
 
 ```text
-codex/12-fix-url-redirect
-codex/18-add-api-docs
-codex/25-refactor-database-layer
+feature/12-fix-url-redirect
+feature/18-add-api-docs
+feature/25-refactor-database-layer
 ```
 
 Use lowercase words separated by hyphens.
