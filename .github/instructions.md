@@ -440,10 +440,10 @@ Then explain that the GitHub connector or integration does not have enough permi
 In that case, provide manual PR steps:
 
 ```bash
-git checkout -b codex/<issue-number>-short-description
+git checkout -b feature/<issue-number>-short-description
 git add .
 git commit -m "<type>: <short summary>"
-git push origin codex/<issue-number>-short-description
+git push origin feature/<issue-number>-short-description
 ```
 
 Then ask the user to open the PR manually from GitHub.

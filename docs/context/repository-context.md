@@ -148,8 +148,8 @@ Current automation scope:
 
 - `dev` and `stage` are automated through GitHub Actions, Docker Hub, and
   Argo CD.
-- `prod` does not currently have an image publishing workflow or Argo CD
-  application documented in this repository.
+- `master` is the production branch for normal promotion. Production deployment
+  is manual and targets the `url-shortener-prod` namespace.
 - The local deployment scripts are still useful for manual Docker Desktop
   testing because they build `url-shortener:dev` locally and override the
   Deployment image after applying the overlay.
@@ -173,14 +173,14 @@ The repository instructions live in `.github/instructions.md`.
 Important workflow expectations:
 
 - Create or use a GitHub issue before implementation work.
-- Use branches named `codex/<issue-number>-short-description`.
+- Use branches named `feature/<issue-number>-short-description`.
 - Keep PR descriptions structured with summary, testing, risk, and checklist.
 - Apply labels and assignees when possible.
 - Do not run `git push` without explicit user approval.
 
-Dev deployment expectations:
+Promotion and deployment expectations:
 
-- Merge feature PRs into `dev`.
+- Merge `feature/**` PRs into `dev`.
 - Let GitHub Actions publish `sunlnx/url-shortener:dev_<short-sha>`.
 - Let the workflow commit the updated dev image tag.
 - Let Argo CD sync the `dev` overlay into `url-shortener-dev`.
@@ -188,6 +188,9 @@ Dev deployment expectations:
 - Let GitHub Actions publish `sunlnx/url-shortener:stage_<short-sha>`.
 - Let the workflow commit the updated stage image tag.
 - Let Argo CD sync the `stage` overlay into `url-shortener-stage`.
+- Promote `stage` into `master`.
+- Treat `master` as the production branch; deploy to `url-shortener-prod` only
+  after explicit manual approval.
 - Use `scripts/deploy-*.sh` only for manual Docker Desktop local testing.
 
 ## Current Documentation Layout
