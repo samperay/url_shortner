@@ -188,6 +188,12 @@ Use this promotion flow for application changes:
 5. Deploy production only after the `stage` changes have reached `master` and
    explicit manual approval is given.
 
+In this repository, the production branch target is `master`. If a user says
+`prod branch`, `production branch`, or asks to promote production changes, treat
+that as `master` unless they explicitly ask for the legacy `prod` branch by
+name. Do not create `stage` to `prod` or `prod` to `master` promotion PRs for
+the normal flow; create `stage` to `master` instead.
+
 GitHub only auto-closes issues when a closing keyword reaches the repository
 default branch, currently `master`. Feature PRs into `dev` may still include
 `Closes #<issue-number>` for traceability, but every promotion PR into `master`
@@ -213,8 +219,8 @@ For Docker Desktop Kubernetes:
   `sunlnx/url-shortener:stage_<short-sha>`.
 - Let Argo CD deploy `stage` branch changes to the `url-shortener-stage`
   namespace.
-- Deploy the `master` commit to the `url-shortener-prod` namespace only after
-  manual approval.
+- Treat `master` as the production branch and deploy the `master` commit to the
+  `url-shortener-prod` namespace only after manual approval.
 
 Use `scripts/deploy-dev.sh`, `scripts/deploy-stage.sh`, and
 `scripts/deploy-prod.sh` only for manual local Docker Desktop testing. These
