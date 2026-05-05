@@ -58,9 +58,15 @@ url_shortener/
 │   ├── context/
 │   │   └── repository-context.md
 │   ├── deployment/
-│   │   └── docker-desktop-kubernetes.md
+│   │   ├── docker-desktop-kubernetes.md
+│   │   └── environment-promotion.md
 │   └── learning/
 │       └── kubernetes-break-fix.md
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       ├── publish-dev-image.yml
+│       └── publish-stage-image.yml
 ├── k8s/
 │   ├── base/
 │   │   ├── deployment.yaml
@@ -70,6 +76,11 @@ url_shortener/
 │       ├── dev/
 │       ├── stage/
 │       └── prod/
+├── scripts/
+│   ├── deploy-dev.sh
+│   ├── deploy-prod.sh
+│   ├── deploy-stage.sh
+│   └── start.sh
 ├── tests/
 ├── requirements.txt
 └── README.md
@@ -116,13 +127,63 @@ pip install -r requirements.txt
 ## ▶️ Running the Application
 
 ```bash
-uvicorn app.main:app --reload
+./scripts/start.sh
 ```
 
 Open in browser:
 
 ```
 http://127.0.0.1:8000
+```
+
+---
+
+## 🐳 Local Docker Desktop Deployment
+
+The deployment scripts are for manual local testing against Docker Desktop
+Kubernetes. They build the local image `url-shortener:dev`, apply the selected
+Kustomize overlay, and override the Deployment to use the local Docker Desktop
+image.
+
+```bash
+./scripts/deploy-dev.sh
+kubectl port-forward svc/url-shortener 30080:80 -n url-shortener-dev
+```
+
+Stage and production local overlays are available through:
+
+```bash
+./scripts/deploy-stage.sh
+./scripts/deploy-prod.sh
+```
+
+---
+
+## 🚢 Dev And Stage GitOps Deployment
+
+The `dev` and `stage` branches are deployed through Docker Hub and Argo CD.
+
+When a commit lands on `dev`, `.github/workflows/publish-dev-image.yml`:
+
+1. Builds the Docker image.
+2. Tags it as `sunlnx/url-shortener:dev_<short_commit_id>`.
+3. Pushes it to Docker Hub.
+4. Updates `k8s/environments/dev/kustomization.yaml` with the new tag.
+5. Commits the tag update back to `dev`.
+
+Argo CD watches the `dev` branch and deploys the updated image to the
+`url-shortener-dev` namespace.
+
+When a commit lands on `stage`, `.github/workflows/publish-stage-image.yml`
+performs the same flow with the `stage_<short_commit_id>` tag, updates
+`k8s/environments/stage/kustomization.yaml`, and lets Argo CD deploy the stage
+overlay to the `url-shortener-stage` namespace.
+
+Required GitHub repository secrets:
+
+```text
+DOCKER_HUB_LOGIN
+DOCKER_HUB_TOKEN
 ```
 
 ---

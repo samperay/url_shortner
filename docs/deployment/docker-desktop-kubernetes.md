@@ -58,17 +58,26 @@ http://localhost:8000
 
 Stop the container with `Ctrl+C`.
 
+For normal non-container local development, use:
+
+```bash
+./scripts/start.sh
+```
+
 ## 2. Deploy to Kubernetes
 
 Apply one environment overlay. For day-to-day development, start with `dev`:
 
 ```bash
-kubectl apply -k k8s/environments/dev
+./scripts/deploy-dev.sh
 ```
 
-Check the rollout:
+The script builds the local Docker image, applies the dev overlay, and waits for
+the rollout. You can also run the commands manually:
 
 ```bash
+docker build -t url-shortener:dev .
+kubectl apply -k k8s/environments/dev
 kubectl rollout status deployment/url-shortener -n url-shortener-dev
 ```
 
@@ -177,9 +186,9 @@ kubectl rollout restart deployment/url-shortener -n url-shortener-dev
 kubectl rollout status deployment/url-shortener -n url-shortener-dev
 ```
 
-If the manifest uses `imagePullPolicy: Never`, Kubernetes uses the local Docker
-Desktop image. If you remove that setting, make sure the image is available from
-a registry your cluster can pull from.
+The local deployment scripts build `url-shortener:dev`, apply the selected
+overlay, and then override the Deployment to use that Docker Desktop image.
+Argo CD deployments use the image tag recorded in the environment overlay.
 
 ## 6. Clean Up
 

@@ -183,15 +183,42 @@ Use this promotion flow for application changes:
 1. Create feature branches from `dev`.
 2. Open feature PRs against the `dev` branch.
 3. After testing passes in `dev`, open a promotion PR from `dev` to `stage`.
-4. After testing passes in `stage`, open a promotion PR from `stage` to `prod`.
-5. Deploy to production only after explicit manual approval.
+4. After testing passes in `stage`, open a promotion PR from `stage` to
+   `master`.
+5. Deploy production only after the `stage` changes have reached `master` and
+   explicit manual approval is given.
+
+GitHub only auto-closes issues when a closing keyword reaches the repository
+default branch, currently `master`. Feature PRs into `dev` may still include
+`Closes #<issue-number>` for traceability, but every promotion PR into `master`
+must also include the closing keywords for all issues carried by the promotion:
+
+```text
+Closes #<issue-number>
+Closes #<another-issue-number>
+```
+
+Before opening a `stage` to `master` promotion PR, review the merged feature PRs
+being promoted and copy their related issue references into the promotion PR
+body. Do not rely on `dev` or `stage` PR closing keywords to close issues.
 
 For Docker Desktop Kubernetes:
 
-- Deploy `dev` changes to the `url-shortener-dev` namespace.
-- Deploy `stage` changes to the `url-shortener-stage` namespace.
-- Deploy `prod` changes to the `url-shortener-prod` namespace only after
+- Merge `dev` changes and let `.github/workflows/publish-dev-image.yml`
+  publish `sunlnx/url-shortener:dev_<short-sha>`.
+- Let Argo CD deploy `dev` branch changes to the `url-shortener-dev`
+  namespace.
+- Merge `dev` into `stage` and let
+  `.github/workflows/publish-stage-image.yml` publish
+  `sunlnx/url-shortener:stage_<short-sha>`.
+- Let Argo CD deploy `stage` branch changes to the `url-shortener-stage`
+  namespace.
+- Deploy the `master` commit to the `url-shortener-prod` namespace only after
   manual approval.
+
+Use `scripts/deploy-dev.sh`, `scripts/deploy-stage.sh`, and
+`scripts/deploy-prod.sh` only for manual local Docker Desktop testing. These
+scripts build and deploy the local `url-shortener:dev` image.
 
 Do not automatically deploy production from a branch push or merge.
 
@@ -227,6 +254,9 @@ The PR must include:
 - Checklist
 - Labels copied from the issue
 - Assignee when possible
+
+For promotion PRs into `master`, the related issue section must include all
+issues included in the promotion with GitHub closing keywords, one per line.
 
 ---
 

@@ -5,9 +5,7 @@ Use this file as a hands-on tutorial for learning Kubernetes by breaking this re
 Start from a healthy deployment:
 
 ```bash
-docker build -t url-shortener:dev .
-kubectl apply -k k8s/environments/dev
-kubectl rollout status deployment/url-shortener -n url-shortener-dev
+./scripts/deploy-dev.sh
 kubectl port-forward svc/url-shortener 30080:80 -n url-shortener-dev
 ```
 
@@ -53,12 +51,12 @@ kubectl describe pod <pod-name> -n url-shortener-dev
 Expected symptom:
 
 ```text
-ErrImageNeverPull
+ImagePullBackOff
 ```
 
 Why it broke:
 
-The Deployment uses `imagePullPolicy: Never`, so Kubernetes expects the image to already exist inside Docker Desktop. `url-shortener:missing` does not exist locally.
+Kubernetes cannot find or pull the image named `url-shortener:missing`.
 
 Fix it:
 
