@@ -70,6 +70,8 @@ url_shortener/
 │       ├── dev/
 │       ├── stage/
 │       └── prod/
+├── scripts/
+│   └── start.sh
 ├── tests/
 ├── requirements.txt
 └── README.md
@@ -116,7 +118,7 @@ pip install -r requirements.txt
 ## ▶️ Running the Application
 
 ```bash
-uvicorn app.main:app --reload
+./scripts/start.sh
 ```
 
 Open in browser:
