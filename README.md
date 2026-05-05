@@ -65,7 +65,8 @@ url_shortener/
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml
-│       └── publish-dev-image.yml
+│       ├── publish-dev-image.yml
+│       └── publish-stage-image.yml
 ├── k8s/
 │   ├── base/
 │   │   ├── deployment.yaml
@@ -158,9 +159,9 @@ Stage and production local overlays are available through:
 
 ---
 
-## 🚢 Dev GitOps Deployment
+## 🚢 Dev And Stage GitOps Deployment
 
-The `dev` branch is deployed through Docker Hub and Argo CD.
+The `dev` and `stage` branches are deployed through Docker Hub and Argo CD.
 
 When a commit lands on `dev`, `.github/workflows/publish-dev-image.yml`:
 
@@ -172,6 +173,11 @@ When a commit lands on `dev`, `.github/workflows/publish-dev-image.yml`:
 
 Argo CD watches the `dev` branch and deploys the updated image to the
 `url-shortener-dev` namespace.
+
+When a commit lands on `stage`, `.github/workflows/publish-stage-image.yml`
+performs the same flow with the `stage_<short_commit_id>` tag, updates
+`k8s/environments/stage/kustomization.yaml`, and lets Argo CD deploy the stage
+overlay to the `url-shortener-stage` namespace.
 
 Required GitHub repository secrets:
 
