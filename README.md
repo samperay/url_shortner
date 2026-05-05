@@ -62,9 +62,14 @@ url_shortener/
 │   └── learning/
 │       └── kubernetes-break-fix.md
 ├── k8s/
-│   ├── namespace.yaml
-│   ├── deployment.yaml
-│   └── service.yaml
+│   ├── base/
+│   │   ├── deployment.yaml
+│   │   ├── kustomization.yaml
+│   │   └── service.yaml
+│   └── environments/
+│       ├── dev/
+│       ├── stage/
+│       └── prod/
 ├── tests/
 ├── requirements.txt
 └── README.md
@@ -248,6 +253,7 @@ Additional project notes are organized under `docs/`:
 
 * [Repository context](docs/context/repository-context.md)
 * [Docker Desktop Kubernetes deployment](docs/deployment/docker-desktop-kubernetes.md)
+* [Environment promotion flow](docs/deployment/environment-promotion.md)
 * [Kubernetes break/fix learning path](docs/learning/kubernetes-break-fix.md)
 
 ---

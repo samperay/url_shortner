@@ -176,6 +176,27 @@ Use lowercase words separated by hyphens.
 
 ---
 
+## Environment Promotion Rules
+
+Use this promotion flow for application changes:
+
+1. Create feature branches from `dev`.
+2. Open feature PRs against the `dev` branch.
+3. After testing passes in `dev`, open a promotion PR from `dev` to `stage`.
+4. After testing passes in `stage`, open a promotion PR from `stage` to `prod`.
+5. Deploy to production only after explicit manual approval.
+
+For Docker Desktop Kubernetes:
+
+- Deploy `dev` changes to the `url-shortener-dev` namespace.
+- Deploy `stage` changes to the `url-shortener-stage` namespace.
+- Deploy `prod` changes to the `url-shortener-prod` namespace only after
+  manual approval.
+
+Do not automatically deploy production from a branch push or merge.
+
+---
+
 ## Git Push Approval Rules
 
 Never run `git push` without explicit user approval.
