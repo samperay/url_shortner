@@ -9,3 +9,7 @@ labels:
       environment: dev
 patches:
   - path: service-patch.yaml
+images:
+  - name: url-shortener
+    newName: sunlnx/url-shortener
+    newTag: dev_4fcb1ec
