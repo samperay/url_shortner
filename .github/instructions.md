@@ -208,7 +208,11 @@ For Docker Desktop Kubernetes:
   publish `sunlnx/url-shortener:dev_<short-sha>`.
 - Let Argo CD deploy `dev` branch changes to the `url-shortener-dev`
   namespace.
-- Deploy `stage` changes to the `url-shortener-stage` namespace.
+- Merge `dev` into `stage` and let
+  `.github/workflows/publish-stage-image.yml` publish
+  `sunlnx/url-shortener:stage_<short-sha>`.
+- Let Argo CD deploy `stage` branch changes to the `url-shortener-stage`
+  namespace.
 - Deploy the `master` commit to the `url-shortener-prod` namespace only after
   manual approval.
 
