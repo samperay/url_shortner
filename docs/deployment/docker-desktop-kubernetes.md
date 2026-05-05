@@ -7,7 +7,8 @@ This guide deploys the FastAPI URL Shortener to the single-node Kubernetes clust
 - FastAPI app served by Uvicorn on port `8000`
 - Docker image named `url-shortener:dev`
 - Kubernetes `Deployment` with one replica
-- Kubernetes `Service` exposed on `http://localhost:30080`
+- Kubernetes `Service` exposed inside the cluster, with local access through
+  `kubectl port-forward`
 - SQLite database stored in an `emptyDir` volume at `/data/url_shortener.db`
 
 `emptyDir` is good for learning because it is simple, but the data disappears when the Pod is deleted. Later, replace it with a `PersistentVolumeClaim`.
@@ -81,15 +82,51 @@ kubectl get all -n url-shortener
 
 ## 3. Open the App
 
-Docker Desktop exposes `NodePort` services on localhost.
+Use `kubectl port-forward` for the most reliable local access path on Docker
+Desktop Kubernetes:
 
-Open:
+```bash
+kubectl port-forward svc/url-shortener 30080:80 -n url-shortener
+```
+
+Keep that terminal open. In another terminal, verify the app:
+
+```bash
+curl http://localhost:30080/health
+```
+
+Expected response:
+
+```json
+{"status":"ok"}
+```
+
+Open the UI:
 
 ```text
 http://localhost:30080
 ```
 
 Try shortening a URL, then click the generated short URL.
+
+### Optional: NodePort Access
+
+The Service is configured as `NodePort` on port `30080`, but Docker Desktop does
+not always expose NodePort traffic on macOS localhost. If this fails:
+
+```bash
+curl http://localhost:30080/health
+```
+
+but the Pod is `Running` and `Ready`, test the Service from inside the cluster:
+
+```bash
+kubectl run curl-test -n url-shortener --rm -i --restart=Never \
+  --image=curlimages/curl -- curl -sS http://url-shortener/health
+```
+
+If the in-cluster test returns `{"status":"ok"}`, the app and Service are
+working. Use `kubectl port-forward` for local browser access.
 
 ## 4. Useful Debug Commands
 
@@ -129,6 +166,9 @@ Check the health endpoint from your machine:
 curl http://localhost:30080/health
 ```
 
+If this only works while `kubectl port-forward` is running, the issue is local
+NodePort exposure, not the application.
+
 ## 5. Update the App
 
 After changing Python or template files:
@@ -139,7 +179,9 @@ kubectl rollout restart deployment/url-shortener -n url-shortener
 kubectl rollout status deployment/url-shortener -n url-shortener
 ```
 
-Because the manifest uses `imagePullPolicy: Never`, Kubernetes uses the local Docker Desktop image.
+If the manifest uses `imagePullPolicy: Never`, Kubernetes uses the local Docker
+Desktop image. If you remove that setting, make sure the image is available from
+a registry your cluster can pull from.
 
 ## 6. Clean Up
 
