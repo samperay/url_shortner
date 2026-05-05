@@ -82,18 +82,19 @@ waits for the dev rollout.
 Deploy stage:
 
 ```bash
-kubectl apply -k k8s/environments/stage
-kubectl rollout status deployment/url-shortener -n url-shortener-stage
+./scripts/deploy-stage.sh
 kubectl port-forward svc/url-shortener 30081:80 -n url-shortener-stage
 ```
 
 Deploy production after manual approval:
 
 ```bash
-kubectl apply -k k8s/environments/prod
-kubectl rollout status deployment/url-shortener -n url-shortener-prod
+./scripts/deploy-prod.sh
 kubectl port-forward svc/url-shortener 30082:80 -n url-shortener-prod
 ```
+
+The production script asks you to type `prod` before it applies the production
+overlay.
 
 Keep the `kubectl port-forward` command running while you test the app.
 
@@ -145,8 +146,7 @@ Before production deployment:
 - Confirm CI passed on `prod`.
 - Confirm the exact image tag or commit being deployed.
 - Get explicit manual approval from the environment owner.
-- Run the production `kubectl apply -k k8s/environments/prod` command only
-  after that approval.
+- Run `./scripts/deploy-prod.sh` only after that approval.
 
 ## Future Cloud Migration Notes
 
