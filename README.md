@@ -71,6 +71,7 @@ url_shortener/
 │       ├── stage/
 │       └── prod/
 ├── scripts/
+│   ├── deploy-dev.sh
 │   └── start.sh
 ├── tests/
 ├── requirements.txt

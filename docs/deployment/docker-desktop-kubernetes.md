@@ -69,12 +69,15 @@ For normal non-container local development, use:
 Apply one environment overlay. For day-to-day development, start with `dev`:
 
 ```bash
-kubectl apply -k k8s/environments/dev
+./scripts/deploy-dev.sh
 ```
 
-Check the rollout:
+The script builds the local Docker image, applies the dev overlay, and waits for
+the rollout. You can also run the commands manually:
 
 ```bash
+docker build -t url-shortener:dev .
+kubectl apply -k k8s/environments/dev
 kubectl rollout status deployment/url-shortener -n url-shortener-dev
 ```
 

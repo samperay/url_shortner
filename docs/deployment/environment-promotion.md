@@ -72,10 +72,12 @@ For non-Kubernetes local development, start the app with:
 Deploy development:
 
 ```bash
-kubectl apply -k k8s/environments/dev
-kubectl rollout status deployment/url-shortener -n url-shortener-dev
+./scripts/deploy-dev.sh
 kubectl port-forward svc/url-shortener 30080:80 -n url-shortener-dev
 ```
+
+The script builds the local Docker image, applies `k8s/environments/dev`, and
+waits for the dev rollout.
 
 Deploy stage:
 
@@ -94,6 +96,22 @@ kubectl port-forward svc/url-shortener 30082:80 -n url-shortener-prod
 ```
 
 Keep the `kubectl port-forward` command running while you test the app.
+
+## Automatic Dev Deployment
+
+The workflow `.github/workflows/deploy-dev-local.yml` deploys to the Docker
+Desktop `url-shortener-dev` namespace when changes are pushed to `dev`.
+
+This workflow requires a self-hosted GitHub Actions runner on your machine with:
+
+- Docker Desktop running
+- Kubernetes enabled in Docker Desktop
+- `kubectl` configured with the `docker-desktop` context
+- The runner labeled `docker-desktop`
+
+GitHub-hosted runners cannot deploy into your laptop's Docker Desktop cluster.
+If a self-hosted runner is not installed, run `./scripts/deploy-dev.sh`
+manually after merging into `dev`.
 
 ## Health Checks
 

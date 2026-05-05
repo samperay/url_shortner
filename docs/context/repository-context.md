@@ -41,6 +41,8 @@ Key files:
 - `app/templates/index.html`: provides the simple HTML form UI.
 - `scripts/start.sh`: starts the local FastAPI development server with reload
   enabled.
+- `scripts/deploy-dev.sh`: builds the local Docker image and deploys the dev
+  Kubernetes overlay to Docker Desktop.
 
 ## Runtime Behavior
 
@@ -99,6 +101,7 @@ Ruff, pytest, and coverage options are configured in `pyproject.toml`.
 The repository includes Docker and local Kubernetes support:
 
 - `scripts/start.sh`: runs the local Uvicorn development server.
+- `scripts/deploy-dev.sh`: deploys the `url-shortener-dev` namespace locally.
 - `Dockerfile`: builds the FastAPI app image.
 - `k8s/base/deployment.yaml`: runs the app with readiness/liveness probes and a
   learning-friendly `emptyDir` SQLite volume.
@@ -141,5 +144,6 @@ Local scripts live under:
 
 ```text
 scripts/
+├── deploy-dev.sh
 └── start.sh
 ```
