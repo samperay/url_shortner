@@ -58,9 +58,11 @@ url_shortener/
 │   ├── context/
 │   │   └── repository-context.md
 │   ├── deployment/
+│   │   ├── argocd-install.md
 │   │   ├── docker-desktop-kubernetes.md
 │   │   └── environment-promotion.md
 │   └── learning/
+│       ├── gitops-argocd-break-fix.md
 │       └── kubernetes-break-fix.md
 ├── .github/
 │   └── workflows/
@@ -349,8 +351,10 @@ Clicking the short URL redirects to the original URL.
 Additional project notes are organized under `docs/`:
 
 * [Repository context](docs/context/repository-context.md)
+* [Install Argo CD on Docker Desktop Kubernetes](docs/deployment/argocd-install.md)
 * [Docker Desktop Kubernetes deployment](docs/deployment/docker-desktop-kubernetes.md)
 * [Environment promotion flow](docs/deployment/environment-promotion.md)
+* [GitOps and Argo CD break/fix learning path](docs/learning/gitops-argocd-break-fix.md)
 * [Kubernetes break/fix learning path](docs/learning/kubernetes-break-fix.md)
 
 ---
