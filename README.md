@@ -95,6 +95,8 @@ url_shortener/
 * **ORM**: SQLAlchemy
 * **Frontend**: HTML (Jinja2 Templates)
 * **Server**: Uvicorn
+* **Quality**: pytest, coverage, Ruff
+* **Deployment**: Docker, Kustomize, Docker Desktop Kubernetes, GitHub Actions, Docker Hub, Argo CD
 
 ---
 
@@ -157,6 +159,14 @@ Stage and production local overlays are available through:
 ./scripts/deploy-prod.sh
 ```
 
+Local environment endpoints:
+
+```text
+dev:   http://localhost:30080
+stage: http://localhost:30081
+prod:  http://localhost:30082
+```
+
 ---
 
 ## 🚢 Dev And Stage GitOps Deployment
@@ -185,6 +195,40 @@ Required GitHub repository secrets:
 DOCKER_HUB_LOGIN
 DOCKER_HUB_TOKEN
 ```
+
+Production is represented by the `master` branch in this repository. Normal
+promotion flow is:
+
+```text
+feature/<issue-number>-short-description -> dev
+dev -> stage
+stage -> master
+```
+
+Production deployment still requires explicit manual approval before running
+`./scripts/deploy-prod.sh`.
+
+---
+
+## 🧪 Testing And CI
+
+Run the local test suite:
+
+```bash
+.venv/bin/python -m pytest -q
+```
+
+Run linting, formatting checks, and coverage:
+
+```bash
+.venv/bin/python -m ruff check .
+.venv/bin/python -m ruff format --check .
+.venv/bin/python -m pytest -q --cov=app --cov-report=term-missing --cov-report=xml
+```
+
+GitHub Actions runs `.github/workflows/ci.yml` on pushes and PRs. The workflow
+runs Ruff, pytest with coverage, uploads coverage artifacts, writes a job
+summary, and posts a sticky coverage comment on PRs.
 
 ---
 
@@ -295,16 +339,8 @@ Clicking the short URL redirects to the original URL.
 * Redis caching
 * Rate limiting
 * Authentication & user accounts
-* Kubernetes deployment (fits your learning path 🚀)
-
----
-
-## 🧪 Testing Ideas
-
-* Test duplicate URL handling
-* Test invalid URL input
-* Test redirect functionality
-* Load test short URL generation
+* Production-ready persistent storage or an external database
+* Ingress, TLS, and cloud Kubernetes deployment
 
 ---
 
@@ -316,17 +352,6 @@ Additional project notes are organized under `docs/`:
 * [Docker Desktop Kubernetes deployment](docs/deployment/docker-desktop-kubernetes.md)
 * [Environment promotion flow](docs/deployment/environment-promotion.md)
 * [Kubernetes break/fix learning path](docs/learning/kubernetes-break-fix.md)
-
----
-
-## 📦 Deployment Ideas
-
-* Dockerize the app
-* Deploy on:
-
-  * AWS EC2 / ECS
-  * IBM Cloud Code Engine
-  * Kubernetes (Ingress + Service)
 
 ---
 

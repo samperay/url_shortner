@@ -203,6 +203,9 @@ This also deletes the `emptyDir` SQLite data.
 For stage and production environment commands, see
 [Environment promotion flow](environment-promotion.md).
 
+For GitOps deployment through Argo CD, see
+[Install Argo CD on Docker Desktop Kubernetes](argocd-install.md).
+
 ## 7. Next Production Improvements
 
 - Replace `emptyDir` with a `PersistentVolumeClaim`.
