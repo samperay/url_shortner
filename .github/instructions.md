@@ -161,15 +161,15 @@ If assignee assignment fails due to permission issues, continue the workflow and
 Create a branch using this format:
 
 ```text
-codex/<issue-number>-short-description
+feature/<issue-number>-short-description
 ```
 
 Examples:
 
 ```text
-codex/12-fix-url-redirect
-codex/18-add-api-docs
-codex/25-refactor-database-layer
+feature/12-fix-url-redirect
+feature/18-add-api-docs
+feature/25-refactor-database-layer
 ```
 
 Use lowercase words separated by hyphens.
@@ -440,10 +440,10 @@ Then explain that the GitHub connector or integration does not have enough permi
 In that case, provide manual PR steps:
 
 ```bash
-git checkout -b codex/<issue-number>-short-description
+git checkout -b feature/<issue-number>-short-description
 git add .
 git commit -m "<type>: <short summary>"
-git push origin codex/<issue-number>-short-description
+git push origin feature/<issue-number>-short-description
 ```
 
 Then ask the user to open the PR manually from GitHub.
