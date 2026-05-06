@@ -12,6 +12,8 @@ For now these environments target Docker Desktop Kubernetes. Later, the same
 layout can be pointed at a cloud Kubernetes cluster by changing image publishing
 and cluster credentials, while keeping the promotion model.
 
+For one-time Argo CD setup, see [Install Argo CD on Docker Desktop Kubernetes](argocd-install.md).
+
 ## One-Time Branch Setup
 
 If the `dev` and `stage` branches do not exist yet, create them from
@@ -154,6 +156,10 @@ These workflows require these GitHub repository secrets:
 The local deployment scripts are still for Docker Desktop-only manual testing.
 They build `url-shortener:dev`, apply the selected overlay, and override the
 Deployment to use the local Docker Desktop image.
+
+Argo CD itself must be installed once in the cluster, and the dev/stage
+Applications must be created before the branch watcher flow can sync changes.
+See [Install Argo CD on Docker Desktop Kubernetes](argocd-install.md).
 
 ## Health Checks
 
