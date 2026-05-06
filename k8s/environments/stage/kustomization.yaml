@@ -12,4 +12,4 @@ patches:
 images:
   - name: url-shortener
     newName: sunlnx/url-shortener
-    newTag: stage_bf70321
+    newTag: stage_b30c0c1
