@@ -2,6 +2,11 @@
 
 Use this file as a hands-on tutorial for learning Kubernetes by breaking this real URL Shortener app and fixing it again.
 
+If you want to practice GitOps behavior after the Kubernetes basics, continue
+with [GitOps and Argo CD break/fix learning path](gitops-argocd-break-fix.md).
+That guide uses Argo CD sync, drift, self-heal, branch, path, and image-tag
+failures to teach the dev/stage GitOps flow.
+
 Start from a healthy deployment:
 
 ```bash

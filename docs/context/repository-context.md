@@ -164,7 +164,7 @@ Local access:
 Deployment docs are grouped under `docs/deployment/`. The Kubernetes layout uses
 a reusable `k8s/base/` manifest and environment overlays under
 `k8s/environments/` for `dev`, `stage`, and `prod`.
-Kubernetes learning exercises are grouped under `docs/learning/`.
+Kubernetes and GitOps learning exercises are grouped under `docs/learning/`.
 
 ## Repository Workflow
 
@@ -204,6 +204,7 @@ docs/
 │   ├── docker-desktop-kubernetes.md
 │   └── environment-promotion.md
 └── learning/
+    ├── gitops-argocd-break-fix.md
     └── kubernetes-break-fix.md
 ```
 
