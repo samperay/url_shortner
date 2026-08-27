@@ -1,6 +1,6 @@
 #!/bin/bash
 # Smart Git Commit Script for git-pushing skill
-# Handles staging, commit message generation, and pushing
+# Handles staging, commit message generation, and push
 
 set -e  # Exit on error
 
