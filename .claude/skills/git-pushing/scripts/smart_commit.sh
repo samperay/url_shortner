@@ -109,10 +109,6 @@ fi
 # Create commit with Claude Code footer
 git commit -m "$(cat <<EOF
 ${COMMIT_MSG}
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 EOF
 )"
 
